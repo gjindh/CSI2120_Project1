@@ -44,14 +44,8 @@ public class SimilaritySearch {
             for (File file : datasetFiles) {
                 ColorHistogram datasetHistogram = new ColorHistogram(file.getAbsolutePath());
 
-                // Print the histogram of the dataset image for debugging
-//                System.out.println("Histogram of " + file.getName() + ": " + Arrays.toString(datasetHistogram.getHistogram()));
-
                 // Compare the histogram of the query image with the histogram of the dataset image
                 double similarity = queryHistogram.compare(datasetHistogram);
-
-                // Print the similarity score for debugging
-//                System.out.println("Similarity with " + file.getName() + ": " + similarity);
 
                 // If the priority queue is full and the current similarity is greater than the smallest similarity in the queue 
                 if (mostSimilarImages.size() == 5 && similarity > mostSimilarImages.peek().similarity()) {

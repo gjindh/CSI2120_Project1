@@ -20,13 +20,15 @@ public class ColorHistogram {
     public ColorHistogram(String filename) throws IOException {
         this.histogram = new double[512]; //from txt files
         this.depth = 3; //3 bits per channel
-        
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            reader.readLine(); // Skip the first line
+
             String line = reader.readLine();
             String[] split = line.split("\\s+");
 
-            for (int i=1; i<split.length; i++) { //skipping the first value (512)
-                this.histogram[i-1] = Double.parseDouble(split[i]);
+            for (int i=0; i < split.length; i++) {
+                this.histogram[i] = Double.parseDouble(split[i]);
             }
         }
     }
@@ -47,9 +49,6 @@ public class ColorHistogram {
         for (int i = 0; i < histogram.length; i++) {
             histogram[i] /= totalPixels;
         }
-
-        // Print out the histogram values for debugging
-        System.out.println(Arrays.toString(histogram));
     }
 
     public double[] getHistogram() {
@@ -59,10 +58,6 @@ public class ColorHistogram {
     public double compare(ColorHistogram other) {
         double[] thisHistogram = this.getHistogram();
         double[] otherHistogram = other.getHistogram();
-
-        // Print the histograms for debugging
-        System.out.println("This histogram: " + Arrays.toString(thisHistogram));
-        System.out.println("Other histogram: " + Arrays.toString(otherHistogram));
 
         double similarity = 0.0;
 
