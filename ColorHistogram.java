@@ -9,15 +9,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 public class ColorHistogram {
-    private double[] histogram;
-    private int depth;
+    private final double[] histogram;
+    private final int depth;
 
-    public ColorHistogram (int d) {
+    public ColorHistogram(int d) {
         this.depth = d;
         this.histogram = new double[(int) Math.pow(2,d*3)]; //d-bit range
     }
 
-    public ColorHistogram (String filename) throws IOException{
+    public ColorHistogram(String filename) throws IOException {
         this.histogram = new double[512]; //from txt files
         this.depth = 3; //3 bits per channel
         
@@ -35,33 +35,43 @@ public class ColorHistogram {
         image.reduceColor(depth); //reduce color from ColorImage class
         Arrays.fill(histogram, 0); //resets the histogram
 
-        for (int i=0; i<image.getWidth(); i++) {
-            for (int j=0; j<image.getHeight(); j++) {
-                int[] rgb = image.getPixel(i, j); //getPixel from ColorImage class
-
-                int index = (rgb[0] << (2 * depth)) + (rgb[1] << depth) + (rgb[2]); //position values correctly for the histogram
+        for (int i=0; i < image.getWidth(); i++) {
+            for (int j=0; j < image.getHeight(); j++) {
+                int[] pixel = image.getPixel(i, j); //getPixel from ColorImage class
+                int index = (pixel[0] << (2 * depth)) + (pixel[1] << depth) + pixel[2]; //position values correctly for the histogram
                 histogram[index]++;
             }
         }
-        
-        double total = Arrays.stream(histogram).sum();
-        for (int i=0; i<histogram.length; i++) {
-            histogram[i] /= total;
+
+        int totalPixels = image.getWidth() * image.getHeight();
+        for (int i = 0; i < histogram.length; i++) {
+            histogram[i] /= totalPixels;
         }
+
+        // Print out the histogram values for debugging
+        System.out.println(Arrays.toString(histogram));
     }
 
-    private double[] getHistogram() {
+    public double[] getHistogram() {
         return histogram;
     }
 
-    public double compare(ColorHistogram hist) {
-        double intersection = 0.0;
+    public double compare(ColorHistogram other) {
+        double[] thisHistogram = this.getHistogram();
+        double[] otherHistogram = other.getHistogram();
 
-        for (int i=0; i<this.histogram.length; i++) {
-            intersection += Math.min(this.histogram[i], hist.histogram[i]);
+        // Print the histograms for debugging
+        System.out.println("This histogram: " + Arrays.toString(thisHistogram));
+        System.out.println("Other histogram: " + Arrays.toString(otherHistogram));
+
+        double similarity = 0.0;
+
+        for (int i = 0; i < thisHistogram.length; i++) {
+            // Compute the similarity for this bin
+            similarity += Math.min(thisHistogram[i], otherHistogram[i]);
         }
 
-        return intersection;
+        return similarity;
     }
 
     public void save(String filename) throws IOException{
@@ -71,5 +81,4 @@ public class ColorHistogram {
             }
         }
     }
-
 }
